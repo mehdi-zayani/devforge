@@ -1,17 +1,17 @@
 import inquirer from "inquirer";
+import { generateAngular } from "../generators/angular.generator.js";
+import { generateReact } from "../generators/react.generator.js";
 
 export async function createCommand() {
-  const { framework } = await inquirer.prompt([
-    {
-      type: "list",
-      name: "framework",
-      message: "Choose framework",
-      choices: ["Angular", "React"],
-    },
+  const { projectName } = await inquirer.prompt([
+    { type: "input", name: "projectName", message: "Project name:" }
   ]);
 
-  let stack = null;
+  const { framework } = await inquirer.prompt([
+    { type: "list", name: "framework", message: "Choose framework", choices: ["Angular", "React"] }
+  ]);
 
+  let stack: string | null = null;
   if (framework === "React") {
     const answer = await inquirer.prompt([
       {
@@ -24,7 +24,9 @@ export async function createCommand() {
     stack = answer.stack;
   }
 
-  console.log("✅ Selection complete:");
-  console.log("Framework:", framework);
-  if (stack) console.log("Stack:", stack);
+  console.log("\n✅ Selection complete:", { projectName, framework, stack });
+
+  
+  if (framework === "Angular") await generateAngular(projectName);
+  else if (framework === "React" && stack) await generateReact(projectName, stack);
 }
